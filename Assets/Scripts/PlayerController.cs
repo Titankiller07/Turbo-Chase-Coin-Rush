@@ -22,10 +22,11 @@ public class PlayerController : MonoBehaviour
     public KeyCode switchKey = KeyCode.C; // Key to press for switching cameras
     
     private bool isMainCameraActive = true;
+    private Rigidbody rb;
 
     void Start()
     {
-        
+        rb = GetComponent<Rigidbody>();
         // Ensure the main camera is active at the start
         if (mainCamera != null && secondaryCamera != null)
         {
@@ -34,16 +35,18 @@ public class PlayerController : MonoBehaviour
         }
 
     }
-    void Update()
-    {
+    void FixedUpdate(){
         // Forward/Backward Movement
         float moveInput = Input.GetAxis("Vertical");
-        transform.Translate(Vector3.forward * moveInput * moveSpeed * Time.deltaTime);
+        Vector3 movement = transform.forward * moveInput * moveSpeed;
+        rb.linearVelocity = new Vector3(movement.x, rb.linearVelocity.y, movement.z);
         
-        // Left/Right Turning
+        // Left/Right Turning (rotation doesn't need physics)
         float turnInput = Input.GetAxis("Horizontal");
         transform.Rotate(Vector3.up * turnInput * turnSpeed * Time.deltaTime);
-
+    }
+    void Update()
+    {
         if (Input.GetKeyDown(switchKey) && mainCamera != null && secondaryCamera != null)
         {
             ToggleCamera();
