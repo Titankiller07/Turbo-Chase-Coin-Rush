@@ -40,6 +40,9 @@ namespace Benjathemaker
             // Adjust start and end scale based on initial scale
             startScale = initialScale;
             endScale = initialScale * (endScale.magnitude / startScale.magnitude);
+                Debug.Log($"Coin initialized at {transform.position}");
+    Debug.Log($"Has Collider: {GetComponent<Collider>() != null}");
+    Debug.Log($"Is Trigger: {GetComponent<Collider>().isTrigger}");
         }
 
         void Update()
@@ -81,13 +84,23 @@ namespace Benjathemaker
         {
             return t < 0.5f ? 2 * t * t : 1 - Mathf.Pow(-2 * t + 2, 2) / 2;
         }
-        void OnTriggerEnter(Collider other)
-        {
-            if (other.CompareTag("Player"))
-            {
-                CollectCoin(other.GetComponent<PlayerController>());
-            }
-        }
+void OnTriggerEnter(Collider other)
+{
+    // More permissive check
+    if (other.GetComponent<PlayerController>() != null)
+    {
+        PlayerController player = other.GetComponent<PlayerController>();
+        player.AddCoins(coinValue);
+        
+        if (collectionEffect != null)
+            Instantiate(collectionEffect, transform.position, Quaternion.identity);
+            
+        if (collectionSound != null)
+            AudioSource.PlayClipAtPoint(collectionSound, transform.position);
+            
+        Destroy(gameObject);
+    }
+}
 
         void CollectCoin(PlayerController player)
         {
@@ -113,4 +126,3 @@ namespace Benjathemaker
         }
     }
 }
-

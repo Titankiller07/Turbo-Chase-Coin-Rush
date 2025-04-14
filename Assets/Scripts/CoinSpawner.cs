@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Benjathemaker;
 
 public class CoinSpawner : MonoBehaviour
 {
@@ -14,10 +15,10 @@ public class CoinSpawner : MonoBehaviour
     private List<GameObject> activeCollectibles = new List<GameObject>();
 
     // Spawn area boundaries (X: -250 to 250, Z: -250 to 250)
-    private const float minX = -250f;
-    private const float maxX = 250f;
-    private const float minZ = -250f;
-    private const float maxZ = 250f;
+    private const float minX = -220f;
+    private const float maxX = 220f;
+    private const float minZ = -220f;
+    private const float maxZ = 220f;
 
     void Start()
     {
@@ -60,29 +61,27 @@ public class CoinSpawner : MonoBehaviour
         return new Vector3(x, spawnHeight, z);
     }
 
-    void SetupCollectible(GameObject collectible)
+   void SetupCollectible(GameObject collectible)
+{
+    // Add SimpleGemsAnim if not present
+    var gemAnim = collectible.GetComponent<SimpleGemsAnim>() ?? collectible.AddComponent<SimpleGemsAnim>();
+    
+    // Configure animation settings
+    gemAnim.isRotating = true;
+    gemAnim.rotateY = true;
+    gemAnim.isFloating = true;
+    gemAnim.useEasingForFloating = true;
+    
+    // Tag as collectible
+    collectible.tag = "Collectible";
+    
+    // Ensure collider is set up
+    if (!collectible.GetComponent<Collider>())
     {
-        // Add collider if not present
-        if (!collectible.GetComponent<Collider>())
-        {
-            var collider = collectible.AddComponent<SphereCollider>();
-            collider.isTrigger = true;
-        }
-        else
-        {
-            collectible.GetComponent<Collider>().isTrigger = true;
-        }
-
-        // Tag as collectible
-        collectible.tag = "Collectible";
-
-        // Add collectible component if not present
-        if (!collectible.GetComponent<Collectible>())
-        {
-            var collector = collectible.AddComponent<Collectible>();
-            collector.spawner = this;
-        }
+        var collider = collectible.AddComponent<SphereCollider>();
+        collider.isTrigger = true;
     }
+}
 
     public void CollectiblePickedUp(GameObject collectedObject)
     {
@@ -96,29 +95,6 @@ public class CoinSpawner : MonoBehaviour
 
             // Spawn a new one
             SpawnCollectible();
-        }
-    }
-}
-
-// This script should be attached to your collectible prefab
-public class Collectible : MonoBehaviour
-{
-    [HideInInspector] public CoinSpawner spawner;
-
-    void OnTriggerEnter(Collider other)
-    {
-        // Check if the collider is the player
-        if (other.CompareTag("Player"))
-        {
-            // Notify spawner that this was collected
-            if (spawner != null)
-            {
-                spawner.CollectiblePickedUp(gameObject);
-            }
-            else
-            {
-                Debug.LogWarning("Collectible has no reference to spawner!");
-            }
         }
     }
 }

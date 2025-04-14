@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement; // Make sure to include this for scene management
 
 
 public class PlayerController : MonoBehaviour
@@ -13,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [Header("Coin Settings")]
     public int coinsCollected = 0;
     public TMPro.TextMeshProUGUI coinText;
+    public int coinsToWin = 10; // Number of coins to collect to win the game
 
     [Header("Camera Settings")]
     public Camera mainCamera;      // Assign your main camera in the Inspector
@@ -31,6 +33,16 @@ public class PlayerController : MonoBehaviour
             secondaryCamera.enabled = false;
         }
 
+    }
+
+     public void AddCoins(int amount)
+    {
+        coinsCollected += amount;
+        UpdateCoinUI();
+         if (coinsCollected >= coinsToWin)
+        {
+            LoadGameOverScene();
+        }
     }
     void Update()
     {
@@ -53,11 +65,6 @@ public class PlayerController : MonoBehaviour
         mainCamera.enabled = isMainCameraActive;
         secondaryCamera.enabled = !isMainCameraActive;
     }
- public void AddCoins(int amount)
-    {
-        coinsCollected += amount;
-        UpdateCoinUI();
-    }
 
     void UpdateCoinUI()
     {
@@ -65,5 +72,9 @@ public class PlayerController : MonoBehaviour
         {
             coinText.text = "Coins Collected: " + coinsCollected;
         }
+    }
+    void LoadGameOverScene()
+    {
+        SceneManager.LoadScene("Game_Over"); // Exact name from Build Settings
     }
 }
