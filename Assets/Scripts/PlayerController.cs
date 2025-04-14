@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 
@@ -13,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [Header("Coin Settings")]
     public int coinsCollected = 0;
     public TMPro.TextMeshProUGUI coinText;
+    public int CoinToWin = 10;
 
     [Header("Camera Settings")]
     public Camera mainCamera;      // Assign your main camera in the Inspector
@@ -57,6 +59,11 @@ public class PlayerController : MonoBehaviour
     {
         coinsCollected += amount;
         UpdateCoinUI();
+        if (coinsCollected >= CoinToWin)
+        {
+            SceneManager.LoadScene(2);
+            // Add your win logic here (e.g., load a new scene, show a win screen, etc.)
+        }
     }
 
     void UpdateCoinUI()

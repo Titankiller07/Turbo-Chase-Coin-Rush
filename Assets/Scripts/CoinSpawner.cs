@@ -13,11 +13,11 @@ public class CoinSpawner : MonoBehaviour
 
     private List<GameObject> activeCollectibles = new List<GameObject>();
 
-    // Spawn area boundaries (X: -250 to 250, Z: -250 to 250)
-    private const float minX = -250f;
-    private const float maxX = 250f;
-    private const float minZ = -250f;
-    private const float maxZ = 250f;
+    
+    private const float minX = -220f;
+    private const float maxX = 220f;
+    private const float minZ = -220f;
+    private const float maxZ = 220f;
 
     void Start()
     {
