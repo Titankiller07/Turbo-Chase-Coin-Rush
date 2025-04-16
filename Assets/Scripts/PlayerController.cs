@@ -34,6 +34,11 @@ public class PlayerController : MonoBehaviour
     public KeyCode boostKey = KeyCode.LeftShift;
     public TextMeshProUGUI boostText; // UI Text to display boost time
 
+    [Header("Ground Check Settings")]
+    public float groundCheckDistance = 0.5f;
+    public LayerMask groundLayer;
+    private bool isGrounded;
+
     private bool isMainCameraActive = true;
     private Rigidbody rb;
     private float currentBoostTime;
@@ -56,6 +61,8 @@ public class PlayerController : MonoBehaviour
     }
     void FixedUpdate(){
 
+        isGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, groundLayer);
+
         if (Input.GetKey(handbrakeKey))
         {
             rb.linearDamping = handbrakeDrag;
@@ -65,10 +72,10 @@ public class PlayerController : MonoBehaviour
             rb.linearDamping = normalDrag;
         }
 
+        if(isGrounded){
         // Forward/Backward Movement
         float moveInput = Input.GetAxis("Vertical");
         Vector3 movement = transform.forward * moveInput * moveSpeed;
-
         if (Input.GetKey(boostKey) && currentBoostTime > 0 && !isBoostOnCooldown)
         {
             movement *= boostMultiplier;
@@ -91,13 +98,18 @@ public class PlayerController : MonoBehaviour
                 UpdateBoostUI();
             }
         }
-        
         // Apply movement
         rb.linearVelocity = new Vector3(movement.x, rb.linearVelocity.y, movement.z);
 
         // Left/Right Turning (rotation doesn't need physics)
         float turnInput = Input.GetAxis("Horizontal");
         transform.Rotate(Vector3.up * turnInput * turnSpeed * Time.deltaTime);
+        }
+        else
+        {
+            // If not grounded, set velocity to zero
+            rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
+        }
     }
     void Update()
     {
