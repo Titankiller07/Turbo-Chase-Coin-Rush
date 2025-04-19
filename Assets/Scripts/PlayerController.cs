@@ -44,6 +44,11 @@ public class PlayerController : MonoBehaviour
     private float currentBoostTime;
     private bool isBoostOnCooldown = false;
 
+    [Header("Game Over Settings")]
+    public int gameOverSceneIndex = 4; // Set this to your game over scene index
+    public float enemyHitCooldown = 1f; // Prevent multiple hits in quick succession
+    private float lastHitTime;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -178,5 +183,34 @@ public class PlayerController : MonoBehaviour
         {
             coinText.text = "Coins Collected: " + coinsCollected;
         }
+    }
+        void OnCollisionEnter(Collision collision)
+    {
+        // Check if collided with an enemy and cooldown has passed
+        if (collision.gameObject.CompareTag("Enemy") && Time.time > lastHitTime + enemyHitCooldown)
+        {
+            lastHitTime = Time.time;
+            GameOver();
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        // Also handle trigger collisions if enemies use trigger colliders
+        if (other.CompareTag("Enemy") && Time.time > lastHitTime + enemyHitCooldown)
+        {
+            lastHitTime = Time.time;
+            GameOver();
+        }
+    }
+
+    void GameOver()
+    {
+        // Load game over scene
+        SceneManager.LoadScene(gameOverSceneIndex);
+        
+        // Alternative: You could also disable player controls instead
+        // this.enabled = false;
+        // Show game over UI, etc.
     }
 }
