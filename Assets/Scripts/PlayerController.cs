@@ -45,7 +45,6 @@ public class PlayerController : MonoBehaviour
     private bool isBoostOnCooldown = false;
 
     [Header("Game Over Settings")]
-    public int gameOverSceneIndex = 4; // Set this to your game over scene index
     public float enemyHitCooldown = 1f; // Prevent multiple hits in quick succession
     private float lastHitTime;
 
@@ -207,7 +206,7 @@ public class PlayerController : MonoBehaviour
     void GameOver()
     {
         // Load game over scene
-        SceneManager.LoadScene(gameOverSceneIndex);
+        SceneManager.LoadScene(4);
         
         // Alternative: You could also disable player controls instead
         // this.enabled = false;
