@@ -5,30 +5,32 @@ using UnityEngine.AI; // Required for NavMesh functionality
 public class EnemyAIFollow : MonoBehaviour
 {
     [Header("Navigation Settings")]
-    [Tooltip("The target to follow (usually the player)")]
-    public Transform target;              // Player's transform
-    
-    [Tooltip("How often to update the path (in seconds)")]
-    public float updateRate = 0.1f;       // How frequently to recalculate path
-    
-    [Tooltip("Stopping distance from target")]
-    public float stoppingDistance = 0; // Distance to stop from player
+    public Transform target;
+    public float updateRate = 0.1f;
+    public float stoppingDistance = 0;
 
     private NavMeshAgent agent;
     private float lastUpdateTime;
-    
-    [Header("Debug")]
-    public bool drawPathGizmo = true;     // Visualize path in Scene view
+    private Rigidbody enemyRb;
+    private bool isAgentActive = true;
+
+    [Header("Physics Settings")]
+    public float enemyUprightForce = 5f;
+    public float enemyUprightTorque = 5f;
+    public float collisionDisableTime = 0.5f;
 
     void Awake()
     {
         // Get the NavMeshAgent component
         agent = GetComponent<NavMeshAgent>();
+        enemyRb = GetComponent<Rigidbody>();
         
         // Configure agent settings
         agent.stoppingDistance = stoppingDistance;
         agent.autoBraking = true;
         agent.autoRepath = true;
+
+        enemyRb.constraints  = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
     }
 
     void Start()
@@ -54,23 +56,59 @@ public class EnemyAIFollow : MonoBehaviour
     void Update()
     {
         // Only update path at specified intervals for performance
-        if (target != null && Time.time - lastUpdateTime > updateRate)
+        if (isAgentActive && agent.isOnNavMesh && target != null && Time.time - lastUpdateTime > updateRate)
         {
             lastUpdateTime = Time.time;
             agent.SetDestination(target.position);
         }
     }
 
-    // Optional: Visualize the path in Scene view
-    void OnDrawGizmos()
+    void FixedUpdate()
     {
-        if (drawPathGizmo && agent != null && agent.hasPath)
+    // Keep enemy upright
+    if (!agent.enabled) // Only if navmesh is disabled (during physics)
+    {
+        Quaternion targetRotation = Quaternion.FromToRotation(transform.up, Vector3.up) * transform.rotation;
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * enemyUprightTorque);
+    }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
         {
-            Gizmos.color = Color.red;
-            for (int i = 0; i < agent.path.corners.Length - 1; i++)
+            // Disable agent temporarily during collision
+            if (isAgentActive)
             {
-                Gizmos.DrawLine(agent.path.corners[i], agent.path.corners[i + 1]);
+                isAgentActive = false;
+                agent.enabled = false;
+                
+                // Apply small repulsion force
+                Vector3 dir = (transform.position - collision.transform.position).normalized;
+                enemyRb.AddForce(dir * 3f, ForceMode.Impulse);
+                
+                // Re-enable after delay
+                Invoke("EnableNavMesh", collisionDisableTime);
             }
+        }
+    }
+    void EnableNavMesh()
+    {
+        if (!agent.isOnNavMesh)
+        {
+            // If agent somehow got off NavMesh, try to warp it back
+            agent.Warp(transform.position);
+        }
+        
+        isAgentActive = true;
+        agent.enabled = true;
+        enemyRb.linearVelocity = Vector3.zero;
+        enemyRb.angularVelocity = Vector3.zero;
+        
+        // Reset destination
+        if (target != null)
+        {
+            agent.SetDestination(target.position);
         }
     }
 }

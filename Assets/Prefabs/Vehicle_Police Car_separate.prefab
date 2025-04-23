@@ -270,7 +270,7 @@ GameObject:
   - component: {fileID: 6310628889570941593}
   - component: {fileID: 1586703195436850414}
   - component: {fileID: 1043515769291994644}
-  - component: {fileID: 306261667571952087}
+  - component: {fileID: 7838934654608339464}
   m_Layer: 0
   m_Name: Vehicle_Police Car_separate
   m_TagString: Enemy
@@ -335,7 +335,9 @@ MonoBehaviour:
   target: {fileID: 0}
   updateRate: 0.1
   stoppingDistance: 0
-  drawPathGizmo: 1
+  enemyUprightForce: 5
+  enemyUprightTorque: 5
+  collisionDisableTime: 0.5
 --- !u!54 &1043515769291994644
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -344,7 +346,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3754249759366919696}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 50
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -360,17 +362,17 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!65 &306261667571952087
-BoxCollider:
+  m_Interpolate: 1
+  m_Constraints: 84
+  m_CollisionDetection: 1
+--- !u!136 &7838934654608339464
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3754249759366919696}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: d71ade1fb9325064aadc9bcf3d21c4a2, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -381,9 +383,11 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.9959545, y: 2.289701, z: 6.337941}
-  m_Center: {x: -0.021483421, y: 1.2779548, z: 0.021853447}
+  serializedVersion: 2
+  m_Radius: 1.5
+  m_Height: 7.5
+  m_Direction: 2
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &4298525221373950230
 GameObject:
   m_ObjectHideFlags: 0

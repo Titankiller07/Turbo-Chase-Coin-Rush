@@ -7,7 +7,7 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
-[Header("Settings")]
+    [Header("Settings")]
     public float moveSpeed = 10f;
     public float turnSpeed = 100f;
     
@@ -44,15 +44,27 @@ public class PlayerController : MonoBehaviour
     private float currentBoostTime;
     private bool isBoostOnCooldown = false;
 
-    [Header("Game Over Settings")]
-    public float enemyHitCooldown = 1f; // Prevent multiple hits in quick succession
+    [Header("Health Settings")]
+    public int maxHealth = 100;
+    public int currentHealth;
+    public TextMeshProUGUI healthText;
+    public float invincibilityTime = 1f;
     private float lastHitTime;
+
+    [Header("Physics Settings")]
+    public float uprightForce = 10f; // Force to keep player upright
+    public float uprightOffset = 0.2f; // How high the raycast starts from bottom
+    public float uprightTorque = 10f; 
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.linearDamping = normalDrag; // Set the initial drag to normal drag
         currentBoostTime = boostDuration;
+
+        currentHealth = maxHealth;
+        UpdateHealthUI();
+
         // Ensure the main camera is active at the start
         if (mainCamera != null && secondaryCamera != null)
         {
@@ -114,6 +126,7 @@ public class PlayerController : MonoBehaviour
             // If not grounded, set velocity to zero
             rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
         }
+        KeepUpright();
     }
     void Update()
     {
@@ -137,6 +150,20 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+    void KeepUpright()
+    {
+    // Apply torque to stay upright
+    Quaternion targetRotation = Quaternion.FromToRotation(transform.up, Vector3.up) * transform.rotation;
+    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * uprightTorque);
+    
+    // Add downward force to prevent flying up
+    if (!isGrounded)
+    {
+        rb.AddForce(Vector3.down * uprightForce, ForceMode.Acceleration);
+    }
+    }
+    
     void UpdateBoostUI()
     {
         if (boostText != null)
@@ -183,23 +210,61 @@ public class PlayerController : MonoBehaviour
             coinText.text = "Coins Collected: " + coinsCollected;
         }
     }
+
         void OnCollisionEnter(Collision collision)
     {
-        // Check if collided with an enemy and cooldown has passed
-        if (collision.gameObject.CompareTag("Enemy") && Time.time > lastHitTime + enemyHitCooldown)
+        // Check if collided with an enemy
+        if (collision.gameObject.CompareTag("Enemy"))
         {
+            TakeDamage(10); // Take 1 damage per hit
+            Vector3 dir = (transform.position - collision.transform.position).normalized;
+            rb.AddForce(dir * 5f, ForceMode.Impulse);
+        }
+    }
+
+
+     void UpdateHealthUI()
+    {
+        if (healthText != null)
+        {
+            healthText.text = "Health: " + currentHealth;
+            
+            // Optional: Change color based on health level
+            if (currentHealth <= 1)
+            {
+                healthText.color = Color.red;
+            }
+            else if (currentHealth <= maxHealth / 2)
+            {
+                healthText.color = Color.yellow;
+            }
+            else
+            {
+                healthText.color = Color.green;
+            }
+        }
+    }
+    void TakeDamage(int damageAmount)
+    {
+        if (Time.time > lastHitTime + invincibilityTime)
+        {
+            currentHealth -= damageAmount;
             lastHitTime = Time.time;
-            GameOver();
+            UpdateHealthUI();
+            
+            if (currentHealth <= 0)
+            {
+                GameOver();
+            }
         }
     }
 
     void OnTriggerEnter(Collider other)
     {
         // Also handle trigger collisions if enemies use trigger colliders
-        if (other.CompareTag("Enemy") && Time.time > lastHitTime + enemyHitCooldown)
+        if (other.CompareTag("Enemy"))
         {
-            lastHitTime = Time.time;
-            GameOver();
+            TakeDamage(10); // Take 1 damage per hit
         }
     }
 
@@ -207,9 +272,5 @@ public class PlayerController : MonoBehaviour
     {
         // Load game over scene
         SceneManager.LoadScene(4);
-        
-        // Alternative: You could also disable player controls instead
-        // this.enabled = false;
-        // Show game over UI, etc.
     }
 }
