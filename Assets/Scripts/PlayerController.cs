@@ -76,8 +76,8 @@ public class PlayerController : MonoBehaviour
 
     }
     void FixedUpdate(){
-
-        isGrounded = Physics.Raycast(transform.position, Vector3.down, groundCheckDistance, groundLayer);
+      Debug.Log($"Grounded: {isGrounded}, MoveInput: {Input.GetAxis("Vertical")}, TurnInput: {Input.GetAxis("Horizontal")}");
+         isGrounded = Physics.CheckSphere(transform.position + (Vector3.down * 0.1f),0.5f,groundLayer);
 
         if (Input.GetKey(handbrakeKey))
         {
