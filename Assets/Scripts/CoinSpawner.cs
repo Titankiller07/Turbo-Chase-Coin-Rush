@@ -51,7 +51,7 @@ public class CoinSpawner : MonoBehaviour
         }
 
         // Initial spawn of enemies
-        for (int i = 0; i < Mathf.Min(2, maxEnemies); i++)
+        for (int i = 0; i < Mathf.Min(1, maxEnemies); i++)
         {
             SpawnEnemy();
         }
