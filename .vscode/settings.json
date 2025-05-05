@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "CS382.sln"
+    "dotnet.defaultSolution": "Turbo-Chase-Coin-Rush.sln"
 }

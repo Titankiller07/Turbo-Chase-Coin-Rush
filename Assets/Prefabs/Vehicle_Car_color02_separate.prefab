@@ -1414,7 +1414,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 4
+  m_Constraints: 84
   m_CollisionDetection: 2
 --- !u!114 &4020952245273891850
 MonoBehaviour:
@@ -1428,11 +1428,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07d89a3b7e0eab84cbe72ec61daffd46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 100
+  moveSpeed: 50
   turnSpeed: 100
   coinsCollected: 0
   coinText: {fileID: 652871929353819150}
-  CoinToWin: 10
+  CoinToWin: 50
   mainCamera: {fileID: 9107328186763938951}
   secondaryCamera: {fileID: 8169669306023349817}
   switchKey: 99
